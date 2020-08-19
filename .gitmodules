@@ -1,0 +1,3 @@
+[submodule "bin"]
+	path = bin
+	url = http://gitea.localhost:8080/ipns/QmVgyPNWW6jK7NKgzpH1GWxF3FKm4rXw8nd4xJnwRkrbuE/bin.git
