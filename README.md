@@ -1,3 +1,7 @@
+---
+---
+<meta charset=utf8/>
+
 # Minimum Lovable Product (architecture documents)
 
 
@@ -25,22 +29,27 @@
 
 ### RELEASE 0.0:
 
-1. module saisie version (optionally collaborative)
+1. [fairPad][1]: module saisie version (optionally collaborative)
    proposed texts are locally stored in each nodes and must be registered to be considered
    (need redundancy among registration servers)
 
-2. module fair distribution of token
+2. [fairToken][2]: module fair distribution of token
 
-3. module distribution of version (gossip ?)
+3. [fairPublish][3]: module distribution of version (gossip ?)
 
    common knowledge of where to find texts (urn...) (common knowledge to be pushed)
    ex. /public/round-1/1-50/text45 (locally centralized: P2P pull)
    
-4. module ranking & reduction texts
+4. [fairRank][4] module ranking & reduction texts (merge tools)
 
-5. interation until reduced set is equally contradictory (option).
+5. [fairMerge][5] interation until reduced set is equally contradictory (option).
 
-6. module vote to decide on final options
+6. [fairDecide][6] module vote to decide on final options
+
+
+### naming convention
+
+  [fairName](fairName.md)
 
 ### definitions ...
 
