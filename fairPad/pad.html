@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<h3>This is our fairPad</h3>
+<textarea id=padcontent row=5 col=78>
+ceci est un texte
+
+
+
+</textarea>
+<br><button id=load onclick=load(event)>load</button>
+<button id=save onclick=save(event)>local save</button>
+<button id=ipfs onclick=save(event)>ipfs save</button>
+<button id=like onclick=line(event)>like</button>
+<button id=pin onclick=pin(event)>pin</button>
+
+<script>
+
+function pin(ev) {
+ let publicKey = 'pinata' 
+ let pinata_api_key = '478cecf4b06ce9e7eaeb';
+ let pinata_secret_xor_key = 'abc';
+ let pinata_secret_api_key = pinata_secret_xor_key ^ DH_secret(publicKey);
+ let textData = document.getElementById('padcontent').value;
+ let qm = ipfsGetContentHash(textData);
+ let status = pinByHash(pinata_api_key,pinata_secret_api_key,qm)
+ console.log('status:',status)
+}
+
+function DH_secret(pubkey) {
+ console.error('TBD');
+}
+
+async function pinByHash(pinataApiKey, pinataSecretApiKey, hashToPin) {
+    const url = `https://api.pinata.cloud/pinning/pinByHash`;
+    const body = {
+        hashToPin: hashToPin,
+        host_nodes: [
+            '/ip6/2a02:120b:c3c7:7a40:34d6:1935:cdec:81fa/tcp/4001',
+            '/ip6/2a02:120b:c3c7:7a40:953d:9b46:ba8:ea2f/tcp/4001'
+        ],
+        pinataMetadata: {
+            name: 'padcontent',
+            keyvalues: {
+                origin: 'fairpad',
+            }
+        }
+    };
+    let headers= {
+                    'pinata_api_key': pinataApiKey,
+                    'pinata_secret_api_key': pinataSecretApiKey
+                }
+
+   return fetch(url,{ headers: headers, method: 'POST'} )
+        .then(function (response) {
+            //handle response here
+        })
+        .catch(function (error) {
+            //handle error here
+        });
+}
+
+function local_save(ev) {
+  let textData = document.getElementById('padcontent').value;
+  download(textData, 'padcontent.txt', 'text/plain');
+}
+
+
+function ipfs_save(ev) {
+  console.error('TBD')
+}
+
+function load(ev) {
+  console.error('TBD')
+}
+
+function download(content, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([content], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
+function ipfsGetContentHash(buf) {
+ url = api_url + 'add?file=blob.data&cid-version=0&hash-only=1'
+ console.log('url: '+url);
+ return fetchPostBinary(url,buf)
+ .then( resp => resp.json() )
+ .then(console.log('ipfsGetContentHash'))
+ .then( json => json.Hash )
+ .catch(console.error)
+
+}
+function fetchPostBinary(url, content) {
+     // right now is same as fetchPostText
+     let form = new FormData(); // need encodeURI ... ??
+     //console.log('fetchPostBinary: '+url,content)
+     form.append('file', content)
+     return fetch(url, { method: "POST", mode: 'cors', body: form })
+     .then(console.log('fetchPostBinary.resp: '))
+     .catch(console.error('fetchPostBinary.catch.resp: '))
+}
+</script>
