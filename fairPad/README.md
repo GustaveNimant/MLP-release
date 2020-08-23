@@ -17,6 +17,8 @@ possiblity to add meta data attached to text :
 
 possiblity to review "timeline" (history travel!)
 
+need voice assistant for non geeks ! (mumble or audio-over-webrtc)
+
 
 [1]: https://en.wikipedia.org/wiki/Lint_(software)
 [2]: https://duckduckgo.com/?q=qscrontract
