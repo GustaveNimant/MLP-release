@@ -1,18 +1,36 @@
 <!DOCTYPE html>
+<html>
+    <head>
+	<meta charset="utf-8">
+	<title>Fair Pad Management</title>
+	<link rel="stylesheet" href="style.css">
 
-<h3>This is our fairPad</h3>
-<textarea id=pad_contentid row=5 col=78>
+	<script src="../../tools/gn_functionScript.js"></script>
+	<script src="../../tools/sha256.js"></script>
+	<script src="../../tools/essential.js"></script>
+	<script class=exp src="../../tools/ipfs.js"></script>
+    </head>
+
+    <body>
+
+	<h3>This is our fairPad</h3>
+	<textarea id=pad_content_id row=5 col=78>
 ceci est un texte
 
 
 
-</textarea>
-<br>
-<button id=load onclick=load(event)>load</button>
-<button id=save onclick=local_save(event)>local save</button>
-<button id=ipfs onclick=ipfs_save(event)>ipfs save</button>
-<button id=like onclick=line(event)>like</button>
-<button id=pin onclick=pin(event)>pin</button>
+	</textarea>
+	<br>
+	load <input id=file_path_load_id name=pathnameload type=text value="/etc/myfile.txt" placeholder="file-to-be-loaded-from-mfs">
+	<button id=load onclick=load(event)>load</button>
+	<button id=save onclick=local_save(event)>local save</button>
+	save as <input id=file_path_save_id name=pathnamesave type=text value="/tmp/pad_content.txt" placeholder="file-location-to-be-saved-to">
+	<button id=ipfs onclick=ipfs_save(event)>ipfs save</button>
+	<button id=like onclick=line(event)>like</button>
+	<button id=pin onclick=pin(event)>pin</button>
+
+    </body>
+</html>
 
 <script>
 
@@ -24,7 +42,7 @@ ceci est un texte
      let pinata_api_key = '478cecf4b06ce9e7eaeb';
      let pinata_secret_xor_key = 'abc';
      let pinata_secret_api_key = pinata_secret_xor_key ^ DH_secret(publicKey);
-     let textData = document.getElementById('pad_contentid').value;
+     let textData = document.getElementById('pad_content_id').value;
      let qm = ipfsGetContentHash(textData);
      let status = pinByHash(pinata_api_key,pinata_secret_api_key,qm)
      console.log(callee+'status:',status)
@@ -44,37 +62,37 @@ ceci est un texte
      
      const url = `https://api.pinata.cloud/pinning/pinByHash`;
      const body = {
-         hashToPin: hashToPin,
-         host_nodes: [
-             '/ip6/2a02:120b:c3c7:7a40:34d6:1935:cdec:81fa/tcp/4001',
-             '/ip6/2a02:120b:c3c7:7a40:953d:9b46:ba8:ea2f/tcp/4001'
-         ],
-         pinataMetadata: {
-             name: 'pad_content',
-             keyvalues: {
-                 origin: 'fairpad',
-             }
-         }
+	 hashToPin: hashToPin,
+	 host_nodes: [
+	     '/ip6/2a02:120b:c3c7:7a40:34d6:1935:cdec:81fa/tcp/4001',
+	     '/ip6/2a02:120b:c3c7:7a40:953d:9b46:ba8:ea2f/tcp/4001'
+	 ],
+	 pinataMetadata: {
+	     name: 'pad_content',
+	     keyvalues: {
+		 origin: 'fairpad',
+	     }
+	 }
      };
      let headers= {
-         'pinata_api_key': pinataApiKey,
-         'pinata_secret_api_key': pinataSecretApiKey
+	 'pinata_api_key': pinataApiKey,
+	 'pinata_secret_api_key': pinataSecretApiKey
      }
 
      return fetch(url,{ headers: headers, method: 'POST'} )
-         .then(function (response) {
-             //handle response here
-         })
-         .catch(function (error) {
-             //handle error here
-         });
+	 .then(function (response) {
+	     //handle response here
+	 })
+	 .catch(function (error) {
+	     //handle error here
+	 });
  }
 
  function local_save(ev) {
      let [callee, caller] = functionNameJS();
      console.log(callee+'.input.ev:',ev);
 
-     let textData = document.getElementById('pad_contentid').value;
+     let textData = document.getElementById('pad_content_id').value;
      download(textData, 'pad_content.txt', 'text/plain');
  }
 
@@ -82,36 +100,37 @@ ceci est un texte
      let [callee, caller] = functionNameJS();
      console.log(callee+'.input.ev:',ev);
 
-     console.error('TBD')
- }
- 
- function saveSingleFile() {
-     let [callee, caller] = functionNameJS();
-     console.log(callee+'.entering');
+     let file_path_save = document.getElementById('file_path_save_id').value;
+     console.log(callee+'.file_path_save:',file_path_save);
      
-     let file_pathsave = document.getElementById('file_pathsaveid').value;
-     console.log(callee+'.file_pathsave:',file_pathsave);
-     
-     let pad_content = document.getElementById("pad_contentid").value;
+     let pad_content = document.getElementById('pad_content_id').value;
      console.log(callee+'.pad_content:',pad_content);
      
-     return ipfsWriteText(file_pathsave, pad_content) // v0.6.0 truncate works !!!
+     return ipfsWriteText(file_path_save, pad_content) // v0.6.0 truncate works !!!
 	 .then ( hash => {
-	     stored['curItem'].Hash = hash
-	     stored['curItem'].FullStatus = null
-	     //stored['curItem'] = null;
-	     console.log(callee+'.stored["curItem"]:',stored['curItem']);
-	     display()
-	     console.log(callee+'file_pathsave: '+file_pathsave+' updated')
+	     console.log(callee+'file_path_save: '+file_path_save+' updated')
 	 })
 	 .catch(err => console.error(err))
  } 
-
- function load(ev) {
+ 
+ async function load(ev) {
      let [callee, caller] = functionNameJS();
      console.log(callee+'.input.ev:',ev);
 
-     console.error('TBD')
+     let file_path_load = document.getElementById('file_path_load_id').value;
+     console.log(callee+'.file_path_load:',file_path_load);
+
+     let content;
+     if ( file_path_load.match(new RegExp('/ip[fn]s/')) ) {
+	 content = await getContentofIpfsPath(file_path_load);
+     } else {
+	 content = await getContentofMfsPath(file_path_load);
+     }
+     console.log(callee+'.content:',content);
+
+     let ele = document.getElementById('pad_content_id');
+     console.log(callee+'.ele:',ele);
+     ele.value = content;
  }
 
  function download(content, fileName, contentType) {
@@ -125,177 +144,6 @@ ceci est un texte
      a.href = URL.createObjectURL(file);
      a.download = fileName;
      a.click();
- }
-
- function getMFSFileHash(mfspath) {
-     let [callee, caller] = functionNameJS();
-     console.log(callee+'.input.mfspath:',mfspath);
-
-     var url = api_url + 'files/stat?arg='+mfspath+'&hash=true'
-     return fetch(url,{method:'POST'})
-	 .then( resp => resp.json() )
-	 .then( json => {
-	     if (typeof json.Hash == 'undefined') {
-		 if (typeof(qmEmpty) != 'undefined') { return qmEmpty }
-		 else { return 'QmYYY' }
-	     } else {
-		 return json.Hash
-	     }
-	 })
-	 .catch(logError)
- }
-
- function ipfsGetContentHash(buf) {
-     let [callee, caller] = functionNameJS();
-     console.log(callee+'.input.buf:',buf);
-
-     url = api_url + 'add?file=blob.data&cid-version=0&hash-only=1'
-     console.log('url: '+url);
-     return fetchPostBinary(url,buf)
-	 .then( resp => resp.json() )
-	 .then(console.log('ipfsGetContentHash'))
-	 .then( json => json.Hash )
-	 .catch(console.error)
- }
-
- function ipfsRmMFSFileUnless06(mfspath) {
-     let [callee, caller] = functionNameJS();
-     console.log(callee+'.input.mfspath:',mfspath);
-
-     if (ipfsversion == '0.6.0') {
-	 console.log('info: assumed truncates works !')
-	 return Promise.resolve('noop');
-     } else {
-	 url = api_url + 'files/rm?arg='+mfspath
-	 return fetch(url,{method:'POST'})
-	     .then( resp => {
-		 if (resp.ok) { return resp.text(); }
-		 else { return resp.json(); }
-	     })
-	     .catch(logError)
-     }
- }
-
- function ipfsWriteContent(mfspath,buf) {
-     let [callee, caller] = functionNameJS();
-     console.log(callee+'.input.mfspath:',mfspath);
-     console.log(callee+'.input.buf:',buf);
-     
-     // truncate doesn't work for version <= 0.4 !
-     // so it does a rm before
-     return createParent(mfspath)
-	 .then(ipfsRmMFSFileUnless06(mfspath))
-	 .then( _ => {
-	     var url = api_url + 'files/write?arg=' + mfspath + '&create=true&truncate=true';
-	     return fetchPostBinary(url, buf)
-		 .then( _ => getMFSFileHash(mfspath)) 
-		 .catch(logError)
-	 })
-	 .catch(consLog('ipfsWriteContent'))
- }
-
- function ipfsWriteText(mfspath,buf) { // truncate doesn't work for version < 0.5 !
-     let [callee, caller] = functionNameJS();
-     console.log(callee+'.input.mfspath:',mfspath);
-     console.log(callee+'.input.buf:',buf);
-
-     return createParent(mfspath)
-	 .then(ipfsRmMFSFileUnless06(mfspath))
-	 .then( _ => {
-	     var url = api_url + 'files/write?arg=' + mfspath + '&create=true&truncate=true';
-	     return fetchPostText(url, buf)
-		 .then( _ => getMFSFileHash(mfspath)) 
-		 .catch(logError)
-	 })
-	 .catch(consLog('ipfsWriteText'))
- }
-
- function fetchPostBinary(url, content) {
-     let [callee, caller] = functionNameJS();
-     console.log(callee+'.input.url:',url);
-     console.log(callee+'.input.content:',content);
-
-     // right now is same as fetchPostText
-     let form = new FormData(); // need encodeURI ... ??
-     //console.log('fetchPostBinary: '+url,content)
-     form.append('file', content)
-     return fetch(url, { method: "POST", mode: 'cors', body: form })
-	 .then(console.log('fetchPostBinary.resp: '))
-	 .catch(console.error('fetchPostBinary.catch.resp: '))
- }
-
- function fetchPostText(url, content) {
-     let [callee, caller] = functionNameJS();
-     console.log(callee+'.input.url:',url);
-     console.log(callee+'.input.content:',content);
-
-     let form = new FormData();
-     form.append('file', content)
-     return fetch(url, { method: "POST", mode: 'cors', body: form })
- }
-
- function functionNameJS () {
-     let stack = new Error().stack;
-
-     //    console.log('functionNameJS.stack:',stack);
-
-     var callee;
-     var caller;
-     var stackArray= [];
-     let navigator = navigatorName();
-     switch (navigator){
-	 case "Chrome":
-             stackArray = stack.split('at ');
-             callee = stackArray[2].split(' ')[0];
-             if (stackArray[3] == undefined) {
-		 caller = "main";
-             }
-             else{
-		 caller = stackArray[3].split(' ')[0];
-             }
-             if(caller.match("http:")){caller = "main"};
-             break;
-
-	 case "Firefox":
-             stackArray = stack.split('\n');
-             callee = stackArray[1].split('@')[0];
-             caller = stackArray[2].split('@')[0];
-             if (caller == "") {caller = "main"};
-             break;
-
-	 default:
-             console.error('functionNameJS.navigator',navigator);
-             throw "unknown navigator "+navigator;
-     } // switch
-
-     return [callee, caller];
- }
-
- function navigatorName () {
-     let navNam = navigator.userAgent;
-     //    console.log('navigatorName.navNam',navNam);
-
-     var result = "";
-     if(navNam.match("Firefox")){
-	 result = "Firefox";
-     }
-     else if(navNam.match("Chrome")){
-	 result = "Chrome";
-     }
-     else {
-	 throw "Error in navigatorName.unknown navigator "+navNam;
-     }
-     //    console.log('navigatorName.result',result);
-     return result;
- }
-
- function consLog(what) { return data => { console.log(what+': ',data); return data; } }
-
- function consErr(what) { return err => { console.error(what+': ',err); return err; } }
-
- function logInfo(msg) {
-     let stack = new Error().stack;
-     console.log('info: ',msg,stack)
  }
 
 </script>
